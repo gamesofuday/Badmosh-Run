@@ -21,7 +21,6 @@ public class PlayerMovement : MonoBehaviour
     public Text gameOverText;         // Game Over Text (optional)
 
     private bool isGameRunning = false; // Tracks if the game has started
-    private bool isFalling = false;     // Tracks if the player is falling
 
     void Start()
     {
@@ -32,7 +31,6 @@ public class PlayerMovement : MonoBehaviour
         // Show menu and set up idle animation
         ShowMenu();
     }
-
     void Update()
     {
         if (!isGameRunning) return; // Skip game logic if the game is not running
@@ -40,27 +38,28 @@ public class PlayerMovement : MonoBehaviour
         // Check if player is grounded
         isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
 
-        // Update falling state
-        if (!isGrounded && rb.velocity.y < 0) // Player is in the air and falling
-        {
-            isFalling = true;
-            animator.SetBool("IsFalling", true); // Play falling animation
-        }
-        else
-        {
-            isFalling = false;
-            animator.SetBool("IsFalling", false); // Stop falling animation
-        }
-
         // Move the player forward continuously
-        if (transform.localScale == originalScale && isGrounded) // Don't move if crouched or airborne
+        transform.Translate(Vector2.right * moveSpeed * Time.deltaTime);
+
+        // Update animation states
+        if (isGrounded)
         {
-            transform.Translate(Vector2.right * moveSpeed * Time.deltaTime);
             animator.SetBool("IsRunning", true);
+            animator.SetBool("IsFalling", false);
         }
         else
         {
             animator.SetBool("IsRunning", false);
+
+            // Check if the player is falling
+            if (rb.velocity.y < 0)
+            {
+                animator.SetBool("IsFalling", true);
+            }
+            else
+            {
+                animator.SetBool("IsFalling", false);
+            }
         }
 
         // Jump Input
@@ -82,6 +81,7 @@ public class PlayerMovement : MonoBehaviour
         // Update grounded animation
         animator.SetBool("IsGrounded", isGrounded);
     }
+
 
     private void Jump()
     {
@@ -113,14 +113,6 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    // Show the menu
-    private void ShowMenu()
-    {
-        menuUI.SetActive(true);  // Enable menu UI
-        animator.SetBool("IsRunning", false);
-        animator.SetBool("IsGrounded", true); // Set idle animation
-    }
-
     // Start the game
     public void StartGame()
     {
@@ -130,12 +122,26 @@ public class PlayerMovement : MonoBehaviour
         animator.SetBool("IsRunning", true);
     }
 
-    // Game over logic
+    // Show the menu
+    public void ShowMenu()
+    {
+        // Reset the game state
+        isGameRunning = false;
+        Time.timeScale = 1f; // Resume the game if paused
+        rb.velocity = Vector2.zero; // Stop player movement
+        transform.position = new Vector3(0, transform.position.y, 0); // Reset player position
+        menuUI.SetActive(true);  // Enable menu UI
+        gameOverUI.SetActive(false); // Hide game over UI
+        animator.SetBool("IsRunning", false);
+        animator.SetBool("IsGrounded", true); // Set idle animation
+    }
+
     private void GameOver()
     {
         isGameRunning = false;
         animator.SetBool("IsRunning", false);
         Time.timeScale = 0f; // Pause the game
-        gameOverUI?.SetActive(true); // Optional: Show game over UI
+        gameOverUI?.SetActive(true); // Show game over UI
     }
+
 }
