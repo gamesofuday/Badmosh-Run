@@ -52,7 +52,7 @@ public class PlayerMovement : MonoBehaviour
             animator.SetBool("IsRunning", false);
 
             // Check if the player is falling
-            if (rb.velocity.y < 0)
+            if (rb.linearVelocity.y < 0)
             {
                 animator.SetBool("IsFalling", true);
             }
@@ -85,7 +85,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void Jump()
     {
-        rb.velocity = new Vector2(rb.velocity.x, jumpForce); // Apply upward force
+        rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce); // Apply upward force
         isGrounded = false; // Player is no longer grounded
         animator.SetTrigger("Jump"); // Play jump animation
     }
@@ -128,7 +128,7 @@ public class PlayerMovement : MonoBehaviour
         // Reset the game state
         isGameRunning = false;
         Time.timeScale = 1f; // Resume the game if paused
-        rb.velocity = Vector2.zero; // Stop player movement
+        rb.linearVelocity = Vector2.zero; // Stop player movement
         transform.position = new Vector3(0, transform.position.y, 0); // Reset player position
         menuUI.SetActive(true);  // Enable menu UI
         gameOverUI.SetActive(false); // Hide game over UI

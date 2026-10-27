@@ -120,7 +120,7 @@ namespace NotSlot.HandPainted2D.Editor
     private static void DetectPipeline ()
     {
       Installer.DetectedPipelineAssetCount = 0;
-      RenderPipelineAsset pipelineAsset = GraphicsSettings.renderPipelineAsset;
+      RenderPipelineAsset pipelineAsset = GraphicsSettings.defaultRenderPipeline;
       if ( pipelineAsset == null )
       {
         Installer.DetectedPipeline = Installer.Renderer.BuiltIn;
